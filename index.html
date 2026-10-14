@@ -111,11 +111,11 @@
         </div>
     </div>
 
-    <input type="text" id="searchInput" class="search-input" placeholder="🔍 Поиск...">
+    <section class="hero-banner" style="margin:22px 0;padding:28px;border-radius:24px;background:linear-gradient(135deg,#17132e,#111118 58%,#24204d);border:1px solid rgba(108,99,255,.35)"><div style="max-width:720px"><div style="color:#a9a2ff;font-size:12px;letter-spacing:2px;text-transform:uppercase">CyberPulse Store</div><h2 style="font-size:clamp(28px,5vw,48px);margin:8px 0">Hardware для security research</h2><p style="color:rgba(255,255,255,.68);max-width:620px">Устройства, модули и прошивки для лабораторий, IoT и разрешённых исследований.</p><a href="#catalog" class="btn-cart" style="display:inline-block;text-decoration:none;margin-top:12px">Смотреть каталог</a></div></section><section class="benefits" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:16px 0 22px"><div class="benefit" style="padding:16px;border:1px solid rgba(255,255,255,.08);border-radius:16px;background:rgba(255,255,255,.03)">🛡️ <b>Проверенные решения</b><small style="display:block;color:rgba(255,255,255,.55);margin-top:5px">Для учебных и лабораторных задач</small></div><div class="benefit" style="padding:16px;border:1px solid rgba(255,255,255,.08);border-radius:16px;background:rgba(255,255,255,.03)">📦 <b>Доставка</b><small style="display:block;color:rgba(255,255,255,.55);margin-top:5px">CDEK и DHL Express</small></div><div class="benefit" style="padding:16px;border:1px solid rgba(255,255,255,.08);border-radius:16px;background:rgba(255,255,255,.03)">💬 <b>Поддержка</b><small style="display:block;color:rgba(255,255,255,.55);margin-top:5px">Поможем подобрать комплект</small></div></section><input type="text" id="searchInput" class="search-input" placeholder="🔍 Поиск по товарам...">
 
     <div class="categories" id="categories"></div>
     
-    <div class="filters" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px"><label style="font-size:13px">Цена от <input id="minPrice" type="number" min="0" placeholder="0" style="width:90px;padding:9px;border-radius:20px;background:#151522;color:#fff;border:1px solid #333"></label><label style="font-size:13px">до <input id="maxPrice" type="number" min="0" placeholder="∞" style="width:90px;padding:9px;border-radius:20px;background:#151522;color:#fff;border:1px solid #333"></label><select id="sortSelect" class="sort-select">
+    <div class="filters" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px"><select id="specFilter" class="sort-select"><option value="">Все характеристики</option><option value="Wi-Fi">Wi-Fi</option><option value="Bluetooth">Bluetooth</option><option value="Sub-GHz">Sub-GHz</option><option value="USB">USB</option><option value="SDR">SDR</option><option value="Linux">Linux</option></select><label style="font-size:13px">Цена от <input id="minPrice" type="number" min="0" placeholder="0" style="width:90px;padding:9px;border-radius:20px;background:#151522;color:#fff;border:1px solid #333"></label><label style="font-size:13px">до <input id="maxPrice" type="number" min="0" placeholder="∞" style="width:90px;padding:9px;border-radius:20px;background:#151522;color:#fff;border:1px solid #333"></label><select id="sortSelect" class="sort-select">
         <option value="default">По умолчанию</option>
         <option value="price_asc">Цена ↑</option>
         <option value="price_desc">Цена ↓</option>
@@ -299,7 +299,7 @@
             const q = searchQuery.toLowerCase();
             filtered = filtered.filter(p => p.name.toLowerCase().includes(q) || (p.desc || '').toLowerCase().includes(q));
         }
-        const min = Number(document.getElementById('minPrice')?.value || 0); const max = Number(document.getElementById('maxPrice')?.value || Infinity); filtered = filtered.filter(p => { const price = Number(p.salePrice || p.price_usd || 0); return price >= min && price <= max; }); if(sortType === 'price_asc') filtered.sort((a,b) => (a.salePrice || a.price_usd) - (b.salePrice || b.price_usd));
+        const spec = document.getElementById('specFilter')?.value || ''; if (spec) filtered = filtered.filter(p => (p.specs || []).some(s => s.toLowerCase().includes(spec.toLowerCase())) || (p.desc || '').toLowerCase().includes(spec.toLowerCase())); const min = Number(document.getElementById('minPrice')?.value || 0); const max = Number(document.getElementById('maxPrice')?.value || Infinity); filtered = filtered.filter(p => { const price = Number(p.salePrice || p.price_usd || 0); return price >= min && price <= max; }); if(sortType === 'price_asc') filtered.sort((a,b) => (a.salePrice || a.price_usd) - (b.salePrice || b.price_usd));
         if(sortType === 'price_desc') filtered.sort((a,b) => (b.salePrice || b.price_usd) - (a.salePrice || a.price_usd));
         return filtered;
     }
@@ -449,7 +449,7 @@
     }
 
     if (searchInput) searchInput.oninput = () => { searchQuery = searchInput.value; renderCatalog(); };
-    document.getElementById('sortSelect').onchange = (e) => { sortType = e.target.value; renderCatalog(); }; ['minPrice','maxPrice'].forEach(id => document.getElementById(id).addEventListener('input', renderCatalog));
+    document.getElementById('sortSelect').onchange = (e) => { sortType = e.target.value; renderCatalog(); }; ['minPrice','maxPrice'].forEach(id => document.getElementById(id).addEventListener('input', renderCatalog)); document.getElementById('specFilter').addEventListener('change', renderCatalog);
     document.getElementById('usdBtn').onclick = () => { currentCurrency = 'USD'; renderCatalog(); renderCartModal(); };
     document.getElementById('rubBtn').onclick = () => { currentCurrency = 'RUB'; renderCatalog(); renderCartModal(); };
 
