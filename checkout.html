@@ -131,10 +131,10 @@
                 <div class="payment-options">
                     <p style="margin-bottom: 12px;">💳 Способы оплаты:</p>
                     <label>
-                        <input type="radio" name="payment" value="card" checked> Оплата картой после подтверждения
+                        <input type="radio" name="payment" value="mir" checked> 💳 МИР<br><input type="radio" name="payment" value="sbp"> 🟢 СБП<br><input type="radio" name="payment" value="visa"> 💳 VISA<br><input type="radio" name="payment" value="mastercard"> 💳 Mastercard
                     </label>
                     <label>
-                        <input type="radio" name="payment" value="crypto"> Криптовалюта (USDT)
+                        <input type="radio" name="payment" value="crypto"> 🪙 Криптовалюта (USDT)
                     </label>
                 </div>
 
@@ -187,12 +187,14 @@
     let totalUSD = 0;
     let rubRate = 92;
     let deliveryCostUSD = 0;
-    const deliveryPrices = { cdek: 5, dhl: 15 };
-    const deliveryNames = { cdek: "📦 CDEK", dhl: "✈️ DHL Express" };
+    const deliveryPrices = { free: 0 };
+    const deliveryNames = { free: '📦 Бесплатная доставка' };
 
     function loadCheckoutData() {
         try {
             const savedCart = localStorage.getItem('checkoutCart');
+            const savedProducts = localStorage.getItem('checkoutProducts');
+            if (savedProducts) { const incoming = JSON.parse(savedProducts); if (Array.isArray(incoming) && incoming.length) products.splice(0, products.length, ...incoming.map(p => ({...p, id:Number(p.id), price_usd:Number(p.price_usd ?? p.price ?? 0), img:p.img || p.image_url || '', name:p.name || 'Товар'}))); }
             if (savedCart) cart = JSON.parse(savedCart);
             const savedCurrency = localStorage.getItem('checkoutCurrency');
             if (savedCurrency) currency = savedCurrency;
@@ -344,6 +346,10 @@ ${orderData.comment || "Нет"}`;
 
     window.closeContactModal = closeContactModal;
 
+    const phoneInput = document.getElementById('phone');
+    phoneInput.setAttribute('maxlength','18');
+    phoneInput.addEventListener('input', () => { const digits = phoneInput.value.replace(/\\D/g,'').slice(0,11); let out=digits; if(digits.length>1) out='+'+digits[0]+' '+digits.slice(1,4)+(digits.length>4?' '+digits.slice(4,7):'')+(digits.length>7?' '+digits.slice(7,9):'')+(digits.length>9?' '+digits.slice(9,11):''); phoneInput.value=out; });
+
     document.getElementById('checkoutForm').onsubmit = async (e) => {
         e.preventDefault();
         
@@ -380,7 +386,7 @@ ${orderData.comment || "Нет"}`;
             return `  • ${p.name} × ${item.quantity} = ${price.val * item.quantity} ${price.sym}`;
         }).filter(Boolean).join('\n');
         
-        const paymentNames = { card: "💳 Оплата картой после подтверждения", crypto: "🪙 Криптовалюта (USDT)" };
+        const paymentNames = { mir: '💳 МИР', sbp: '🟢 СБП', visa: '💳 VISA', mastercard: '💳 Mastercard', crypto: '🪙 Криптовалюта (USDT)' };
         const total = getPrice(totalUSD + deliveryCostUSD);
         
         const orderData = {
