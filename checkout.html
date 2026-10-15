@@ -104,9 +104,26 @@
                     <input type="email" id="email" required placeholder="example@mail.ru">
                 </div>
                 <div class="form-group">
+                    <label>Страна *</label>
+                    <select id="country" required>
+                        <option value="" disabled selected>-- Выберите страну --</option>
+                        <option value="cis">Россия</option>
+                        <option value="cis">Беларусь</option>
+                        <option value="cis">Казахстан</option>
+                        <option value="cis">Армения</option>
+                        <option value="cis">Кыргызстан</option>
+                        <option value="cis">Молдова</option>
+                        <option value="cis">Таджикистан</option>
+                        <option value="cis">Узбекистан</option>
+                        <option value="cis">Азербайджан</option>
+                        <option value="outside">Другая страна — доплата $15</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label>Способ доставки *</label>
                     <select id="delivery" required>
-                        <option value="free" selected>📦 Бесплатная доставка (0 $)</option>
+                        <option value="cdek" selected>📦 CDEK — бесплатно для СНГ</option>
+                        <option value="dhl">✈️ DHL Express — бесплатно для СНГ</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -184,8 +201,8 @@
     let totalUSD = 0;
     let rubRate = 92;
     let deliveryCostUSD = 0;
-    const deliveryPrices = { free: 0 };
-    const deliveryNames = { free: '📦 Бесплатная доставка' };
+    const deliveryPrices = { cdek: 0, dhl: 0 };
+    const deliveryNames = { cdek: '📦 CDEK', dhl: '✈️ DHL Express' };
 
     function loadCheckoutData() {
         try {
@@ -257,10 +274,9 @@
         document.getElementById('orderTotal').innerHTML = `${total.val} ${total.sym}`;
     }
 
-    document.getElementById('delivery').onchange = (e) => {
-        deliveryCostUSD = deliveryPrices[e.target.value] || 0;
-        renderOrderSummary();
-    };
+    document.getElementById('delivery').onchange = (e) => { updateDeliveryCost(); renderOrderSummary(); };
+    document.getElementById('country').onchange = () => { updateDeliveryCost(); renderOrderSummary(); };
+    function updateDeliveryCost() { deliveryCostUSD = document.getElementById('country').value === 'outside' ? 15 : 0; const d=document.getElementById('delivery'); d.options[0].textContent='📦 CDEK — '+(deliveryCostUSD?'доплата $15':'бесплатно для СНГ'); d.options[1].textContent='✈️ DHL Express — '+(deliveryCostUSD?'доплата $15':'бесплатно для СНГ'); }
 
     function generateOrderNumber() {
         const date = new Date();
@@ -363,6 +379,8 @@ ${orderData.comment || "Нет"}`;
         if (!fullName) { showToast("Введите ФИО", "#F87171"); return; }
         if (!phone) { showToast("Введите телефон", "#F87171"); return; }
         if (!email) { showToast("Введите Email", "#F87171"); return; }
+        const country = document.getElementById('country').value;
+        if (!country) { showToast("Выберите страну", "#F87171"); return; }
         if (!delivery) { showToast("Выберите способ доставки", "#F87171"); return; }
         if (!city) { showToast("Введите город", "#F87171"); return; }
         if (!address) { showToast("Введите адрес", "#F87171"); return; }
@@ -388,7 +406,8 @@ ${orderData.comment || "Нет"}`;
         
         const orderData = {
             orderNumber, fullName, phone, email,
-            delivery: deliveryNames[delivery] || delivery,
+            country: country === 'outside' ? 'За пределами СНГ' : 'СНГ',
+            delivery: deliveryNames[delivery] || delivery + (country === 'outside' ? ' (+$15)' : ' (бесплатно)'),
             city, address, zip,
             items: itemsList,
             payment: paymentNames[payment] || payment,
