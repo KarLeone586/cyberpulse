@@ -338,8 +338,7 @@
                         ${oldPriceText ? `<span class="old-price">${oldPriceText}</span>` : ''}
                         ${hasSale ? `<span class="sale-badge">🔥</span>` : ''}
                     </div>
-                    <button class="btn-details" onclick="openProduct(${p.id})">📖 Подробнее</button>
-                    <button class="btn-cart" onclick="addToCart(${p.id})">${inCart ? '✓ В корзине' : '+ В корзину'}</button>
+                    <button class="btn-details" onclick="openProduct(${p.id})">Открыть товар</button>
                 </div>
             `;
         }).join('');
