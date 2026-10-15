@@ -291,6 +291,12 @@ ${orderData.comment || "Нет"}`;
  btn.disabled = true;
  btn.innerText = "⏳ Формирование заказа...";
  
+ const apiItems = cart.map(item => { const p = products.find(pp => pp.id === item.id); return { name: p?.name || 'Товар', quantity: item.quantity, price_usd: Number((p?.price_usd || 0) * item.quantity) }; }).filter(x => x.name);
+ try {
+  const apiResponse = await fetch('https://cyberpulse-api-production.up.railway.app/api/orders', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({customer_name:fullName,customer_email:email,customer_phone:phone,city,address,zip,country:orderData.country,payment:orderData.payment,delivery:orderData.delivery,items:apiItems,total_usd:Number(totalUSD + deliveryCostUSD)}) });
+  if (!apiResponse.ok) throw new Error('Не удалось передать заказ на сервер');
+ } catch (error) { showToast(error.message, '#F87171'); btn.disabled=false; btn.innerText='Оформить заказ'; return; }
+ btn.innerText='Заказ передан в обработку';
  const copied = await copyOrderMessage(orderData);
  showToast(copied ? " Данные заказа скопированы. Отправьте их администратору." : "Заказ сформирован. Отправьте номер заказа администратору.", copied ? "#4ADE80" : "#FBBF24");
  
