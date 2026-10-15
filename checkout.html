@@ -106,7 +106,7 @@
                 <div class="form-group">
                     <label>Способ доставки *</label>
                     <select id="delivery" required>
-                        <option value="" disabled selected>-- Выберите способ доставки --</option>
+                        <option value="free" selected>📦 Бесплатная доставка (0 $)</option>
                         <option value="cdek">📦 CDEK ($5)</option>
                         <option value="dhl">✈️ DHL Express ($15)</option>
                     </select>
@@ -240,7 +240,7 @@
             return `
                 <div class="order-item">
                     <div class="order-item-info">
-                        <span class="order-item-img">${p.img}</span>
+                        <img class="order-item-img" src="${escapeHtml(p.img)}" alt="${escapeHtml(p.name)}">
                         <div>
                             <strong>${escapeHtml(p.name)}</strong>
                             <div style="font-size:12px; color:rgba(255,255,255,0.5);">${price.val} ${price.sym} × ${item.quantity}</div>
