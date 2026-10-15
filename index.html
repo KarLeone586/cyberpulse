@@ -230,6 +230,10 @@
     window.openProduct = function(id) {
         const product = products.find(p => p.id === id);
         if(product) {
+            const key = 'cyberpulse-clicks';
+            const clicks = JSON.parse(localStorage.getItem(key) || '{}');
+            clicks[id] = Number(clicks[id] || 0) + 1;
+            localStorage.setItem(key, JSON.stringify(clicks));
             localStorage.setItem('currentProduct', JSON.stringify(product));
             window.location.href = 'product.html';
         }
