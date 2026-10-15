@@ -54,7 +54,7 @@
             .main-image img { height: 78vw; max-height: 420px; border-radius: 20px; }
             .main-image .fallback { font-size: 80px; }
         }
-    </style>
+    .related{background:rgba(108,99,255,.08);border:1px solid rgba(108,99,255,.25);border-radius:16px;padding:18px;margin-top:20px}.related h3{margin-bottom:8px}.related-note{color:rgba(255,255,255,.62);font-size:13px;margin-bottom:12px}.related-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}.related-item{display:flex;flex-direction:column;gap:7px;padding:13px;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:rgba(0,0,0,.18)}.related-item strong{font-size:14px}.related-item small{color:rgba(255,255,255,.62);line-height:1.4;flex:1}.related-item button{border:0;border-radius:9px;background:#6c63ff;color:#fff;padding:9px;cursor:pointer;font-weight:600}.related-type{font-size:11px;color:#a9a2ff;text-transform:uppercase;letter-spacing:.08em}</style>
 </head>
 <body>
 <div class="container">
@@ -180,11 +180,36 @@
                         <ul>${specs.map(s => `<li>${escapeHtml(s)}</li>`).join('')}</ul>
                     </div>
                     <button class="btn-add-cart" onclick="addToCart(${product.id})">🛒 Добавить в корзину</button>
+                    <div id="relatedSection"></div>
                 </div>
             </div>
         `;
     }
 
+    const RELATED_CATALOG = [
+        {name:'CC1101 модуль', type:'Модуль', devices:['Flipper Zero'], desc:'Расширяет работу с Sub-GHz и радиочастотными экспериментами через GPIO.'},
+        {name:'NRF24 для Flipper Zero', type:'Модуль', devices:['Flipper Zero'], desc:'Модуль для лабораторных экспериментов с радиопротоколами 2.4 ГГц.'},
+        {name:'SUB-GHZ PRO модуль', type:'Модуль', devices:['Flipper Zero'], desc:'Дополнительный радиочастотный модуль для совместимых проектов Sub-GHz.'},
+        {name:'BadUSB для Flipper Zero', type:'Аксессуар', devices:['Flipper Zero'], desc:'Учебный USB-модуль для автоматизации собственных устройств и тестовых стендов.'},
+        {name:'Кастомная прошивка для Flipper Zero', type:'Прошивка', devices:['Flipper Zero'], desc:'Дополнительные функции и настройки для разрешённых лабораторных сценариев.'},
+        {name:'ESP32 Marauder V6', type:'Прошивка / модуль', devices:['ESP32'], desc:'Инструменты диагностики Wi‑Fi для собственного оборудования и учебной лаборатории.'},
+        {name:'ESP32 Multi-Tool', type:'Прошивка / модуль', devices:['ESP32'], desc:'Набор утилит для экспериментов с ESP32, GPIO и сетевыми протоколами.'},
+        {name:'PortaPack firmware', type:'Прошивка', devices:['HackRF One','HackRF One Portapack H2'], desc:'Программное расширение для автономной работы PortaPack и SDR-исследований.'},
+        {name:'SDR++ / GNU Radio setup', type:'ПО', devices:['HackRF One','HackRF One Portapack H2'], desc:'Программная связка для анализа спектра и работы с SDR-оборудованием.'},
+        {name:'Raspberry Pi security image', type:'Прошивка', devices:['Raspberry Pi 4 (8GB)','UConsole'], desc:'Образ Linux для учебных лабораторий, автоматизации и собственных IoT-проектов.'}
+    ];
+    function relatedFor(product){
+        const name=String(product?.name||'').toLowerCase();
+        let device=name.includes('flipper')?'Flipper Zero':name.includes('hackrf')||name.includes('portapack')?'HackRF One':name.includes('esp32')?'ESP32':name.includes('raspberry')||name.includes('uconsole')?'Raspberry Pi 4 (8GB)':null;
+        return device?RELATED_CATALOG.filter(x=>x.devices.includes(device)&&!name.includes(x.name.toLowerCase().split(' ')[0])).slice(0,4):[];
+    }
+    function renderRelated(){
+        const box=document.getElementById('relatedSection'); if(!box||!product)return;
+        const items=relatedFor(product); if(!items.length){box.innerHTML='';return;}
+        box.innerHTML='<div class="related"><h3>Совместимые модули и прошивки</h3><div class="related-note">Рекомендуемые дополнения для устройства «'+escapeHtml(product.name)+'».</div><div class="related-grid">'+items.map((x,i)=>'<div class="related-item"><span class="related-type">'+escapeHtml(x.type)+'</span><strong>'+escapeHtml(x.name)+'</strong><small>'+escapeHtml(x.desc)+'</small><button type="button" onclick="addRelated('+i+')">Добавить к заказу</button></div>').join('')+'</div></div>';
+        window.__relatedItems=items;
+    }
+    window.addRelated=function(i){const x=(window.__relatedItems||[])[i];if(!x)return;const id=9000+i;const cart=JSON.parse(localStorage.getItem('cart')||'[]');const found=cart.find(p=>p.id===id);if(found)found.quantity++;else cart.push({id,quantity:1});localStorage.setItem('cart',JSON.stringify(cart));showToast('Дополнение добавлено в корзину','#4ADE80');updateCartCount();};
     document.getElementById('cartIcon').onclick = () => { window.location.href = 'index.html'; };
 
     function renderReviews(){const list=document.getElementById("reviewsList");const all=JSON.parse(localStorage.getItem("reviews")||"[]").filter(r=>!product||r.productId===product.id);list.innerHTML=all.length?all.map(r=>"<div style=\"padding:12px 0;border-bottom:1px solid rgba(255,255,255,.08)\"><b>"+r.name+"</b> <span style=\"color:#ffd166\">"+"★".repeat(r.rating)+"</span><p style=\"color:rgba(255,255,255,.7)\">"+r.text+"</p></div>").join(""):"<p style=\"color:rgba(255,255,255,.5)\">Пока нет отзывов — будьте первым.</p>";} document.getElementById("reviewForm").addEventListener("submit",e=>{e.preventDefault();const all=JSON.parse(localStorage.getItem("reviews")||"[]");all.push({productId:product.id,name:reviewName.value,rating:Number(reviewRating.value),text:reviewText.value});localStorage.setItem("reviews",JSON.stringify(all));e.target.reset();renderReviews();}); loadProduct(); renderReviews();
