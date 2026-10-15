@@ -255,7 +255,7 @@
         const delivery = getPrice(deliveryCostUSD);
         const total = getPrice(totalUSD + deliveryCostUSD);
         document.getElementById('subtotal').innerHTML = `${subtotal.val} ${subtotal.sym}`;
-        document.getElementById('deliveryCost').innerHTML = deliveryCostUSD === 0 ? 'Выберите доставку' : `${delivery.val} ${delivery.sym}`;
+        document.getElementById('deliveryCost').innerHTML = document.getElementById('delivery').value ? '📦 Бесплатно' : 'Выберите доставку';
         document.getElementById('orderTotal').innerHTML = `${total.val} ${total.sym}`;
     }
 
