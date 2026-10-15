@@ -107,8 +107,6 @@
                     <label>Способ доставки *</label>
                     <select id="delivery" required>
                         <option value="free" selected>📦 Бесплатная доставка (0 $)</option>
-                        <option value="cdek">📦 CDEK ($5)</option>
-                        <option value="dhl">✈️ DHL Express ($15)</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -347,7 +345,7 @@ ${orderData.comment || "Нет"}`;
 
     const phoneInput = document.getElementById('phone');
     phoneInput.setAttribute('maxlength','18');
-    phoneInput.addEventListener('input', () => { const digits = phoneInput.value.replace(/\\D/g,'').slice(0,11); let out=digits; if(digits.length>1) out='+'+digits[0]+' '+digits.slice(1,4)+(digits.length>4?' '+digits.slice(4,7):'')+(digits.length>7?' '+digits.slice(7,9):'')+(digits.length>9?' '+digits.slice(9,11):''); phoneInput.value=out; });
+    phoneInput.addEventListener('input', () => { phoneInput.value = phoneInput.value.replace(/\\D/g,'').slice(0,11); });
 
     document.getElementById('checkoutForm').onsubmit = async (e) => {
         e.preventDefault();
