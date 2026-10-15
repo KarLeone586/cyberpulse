@@ -345,7 +345,7 @@ ${orderData.comment || "Нет"}`;
 
     const phoneInput = document.getElementById('phone');
     phoneInput.setAttribute('maxlength','18');
-    phoneInput.addEventListener('input', () => { phoneInput.value = phoneInput.value.replace(/\\D/g,'').slice(0,11); });
+    phoneInput.addEventListener('input', () => { phoneInput.value = phoneInput.value.replace(/\D/g,'').slice(0,11); });
 
     document.getElementById('checkoutForm').onsubmit = async (e) => {
         e.preventDefault();
