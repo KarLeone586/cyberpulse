@@ -181,8 +181,8 @@
                         <h3>📋 Характеристики</h3>
                         <ul>${specs.map(s => `<li>${escapeHtml(s)}</li>`).join('')}</ul>
                     </div>
-                    <button class="btn-add-cart" onclick="addToCart(${product.id})">🛒 Добавить в корзину</button><button class="btn-add-cart buy-now" onclick="buyNow(${product.id})">Купить сейчас</button>
                     <div id="relatedSection"></div>
+                    <button class="btn-add-cart" onclick="addToCart(${product.id})">🛒 Добавить в корзину</button><button class="btn-add-cart buy-now" onclick="buyNow(${product.id})">Купить сейчас</button>
                 </div>
             </div>
         `;
